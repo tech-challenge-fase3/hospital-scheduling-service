@@ -1,5 +1,7 @@
 server:
   port: ${SERVER_PORT:8081}
+  servlet:
+    context-path: /api/v1/appointments
 
 spring:
   application:
@@ -7,8 +9,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:hospital_db}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:postgres}
+    username: ${DB_USER:admin}
+    password: ${DB_PASSWORD:adminpassword}
     driver-class-name: org.postgresql.Driver
 
   jpa:
