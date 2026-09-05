@@ -1,15 +1,17 @@
 package com.hospital.scheduling_service.application;
 
-import com.hospital.scheduling_service.infra.controller.dto.AppointmentRequestDTO;
-import com.hospital.scheduling_service.infra.controller.dto.AppointmentResponseDTO;
-import com.hospital.scheduling_service.infra.persistence.AppointmentEntity;
-import com.hospital.scheduling_service.infra.persistence.AppointmentRepository;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hospital.scheduling_service.infra.controller.dto.AppointmentRequestDTO;
+import com.hospital.scheduling_service.infra.controller.dto.AppointmentResponseDTO;
+import com.hospital.scheduling_service.infra.controller.exception.AppointmentNotFoundException;
+import com.hospital.scheduling_service.infra.persistence.AppointmentEntity;
+import com.hospital.scheduling_service.infra.persistence.AppointmentRepository;
 
 @Service
 public class AppointmentService {
@@ -42,7 +44,7 @@ public class AppointmentService {
     @Transactional(readOnly = true)
     public AppointmentResponseDTO findById(UUID id) {
         AppointmentEntity entity = appointmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Consulta não encontrada com o ID: " + id));
+                .orElseThrow(() -> new AppointmentNotFoundException("Agendamento não encontrado para o ID informado"));
         return AppointmentResponseDTO.fromEntity(entity);
     }
 
