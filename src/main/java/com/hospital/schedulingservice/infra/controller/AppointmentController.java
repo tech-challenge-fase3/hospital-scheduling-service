@@ -1,0 +1,94 @@
+package com.hospital.schedulingservice.infra.controller;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hospital.schedulingservice.application.usecase.CreateAppointmentUseCase;
+import com.hospital.schedulingservice.application.usecase.FindAppointmentByIdUseCase;
+import com.hospital.schedulingservice.application.usecase.ListAppointmentsUseCase;
+import com.hospital.schedulingservice.application.usecase.UpdateAppointmentUseCase;
+import com.hospital.schedulingservice.domain.appointment.Appointment;
+import com.hospital.schedulingservice.infra.controller.docs.AppointmentControllerDocs;
+import com.hospital.schedulingservice.infra.controller.dto.AppointmentRequestDTO;
+import com.hospital.schedulingservice.infra.controller.dto.AppointmentResponseDTO;
+import com.hospital.schedulingservice.infra.controller.dto.UpdateAppointmentRequestDTO;
+import com.hospital.schedulingservice.infra.persistence.mappers.AppointmentWebMapper;
+
+import jakarta.validation.Valid;
+
+@RestController
+public class AppointmentController implements AppointmentControllerDocs {
+
+    private final AppointmentWebMapper appointmentWebMapper;
+    private final CreateAppointmentUseCase createAppointmentUseCase;
+    private final FindAppointmentByIdUseCase findAppointmentByIdUseCase;
+    private final ListAppointmentsUseCase listAppointmentsUseCase;
+    private final UpdateAppointmentUseCase updateAppointmentUseCase;
+
+    public AppointmentController(
+            CreateAppointmentUseCase createAppointmentUseCase,
+            FindAppointmentByIdUseCase findAppointmentByIdUseCase,
+            AppointmentWebMapper appointmentWebMapper,
+            ListAppointmentsUseCase listAppointmentsUseCase,
+            UpdateAppointmentUseCase updateAppointmentUseCase) {
+
+        this.createAppointmentUseCase = createAppointmentUseCase;
+        this.appointmentWebMapper = appointmentWebMapper;
+        this.findAppointmentByIdUseCase = findAppointmentByIdUseCase;
+        this.listAppointmentsUseCase = listAppointmentsUseCase;
+        this.updateAppointmentUseCase = updateAppointmentUseCase;
+    }
+
+    @Override
+    public ResponseEntity<AppointmentResponseDTO> create(@Valid AppointmentRequestDTO request) {
+        Appointment appointment = createAppointmentUseCase.execute(
+                request.patientId(),
+                request.doctorId(),
+                request.appointmentDate(),
+                request.notes()
+        );
+
+        AppointmentResponseDTO response
+                = appointmentWebMapper.toResponse(appointment);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Override
+    public ResponseEntity<List<AppointmentResponseDTO>> listAll() {
+        List<AppointmentResponseDTO> appointments
+                = listAppointmentsUseCase.execute()
+                        .stream()
+                        .map(appointmentWebMapper::toResponse)
+                        .toList();
+
+        return ResponseEntity.ok(appointments);
+    }
+
+    @Override
+    public ResponseEntity<AppointmentResponseDTO> findById(UUID id) {
+        Appointment appointment = findAppointmentByIdUseCase.execute(id);
+        AppointmentResponseDTO response
+                = appointmentWebMapper.toResponse(appointment);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<AppointmentResponseDTO> update(UUID id, @Valid UpdateAppointmentRequestDTO request) {
+        Appointment appointment = updateAppointmentUseCase.execute(
+                id,
+                request.appointmentDate(),
+                request.notes()
+        );
+
+        AppointmentResponseDTO response
+                = appointmentWebMapper.toResponse(appointment);
+
+        return ResponseEntity.ok(response);
+    }
+
+}

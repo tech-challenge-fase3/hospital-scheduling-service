@@ -16,6 +16,9 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
   flyway:
     enabled: true
@@ -36,3 +39,13 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USER:guest}
     password: ${RABBITMQ_PASSWORD:guest}
+
+logging:
+  level:
+    root: INFO
+    com.hospital.schedulingservice: INFO
+    com.hospital.schedulingservice.infra.messaging: INFO
+    com.hospital.schedulingservice.infra.persistence: INFO
+    org.springframework.amqp.rabbit: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
