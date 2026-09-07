@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.security.access.AccessDeniedException;
 
 import com.hospital.schedulingservice.domain.appointment.AppointmentConflictException;
 
@@ -75,6 +76,18 @@ public class ApiExceptionHandler {
         log.warn("Validação da requisição de agendamento rejeitada: {}", message);
 
         return buildResponse(HttpStatus.BAD_REQUEST, message);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(
+            AccessDeniedException exception) {
+
+        log.warn("Acesso negado: {}", exception.getMessage());
+
+        return buildResponse(
+                HttpStatus.FORBIDDEN,
+                "Usuário não autorizado a acessar este recurso"
+        );
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)

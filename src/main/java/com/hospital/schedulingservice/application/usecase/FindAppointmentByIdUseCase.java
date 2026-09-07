@@ -20,6 +20,12 @@ public class FindAppointmentByIdUseCase {
     public Appointment execute(UUID id) {
         return appointmentRepository.findById(id)
                 .orElseThrow(() -> new AppointmentNotFoundException(
-                        "Agendamento não encontrado para o ID informado"));
+                "Agendamento não encontrado para o ID informado"));
+    }
+
+    public Appointment executeForPatient(UUID id, String patientId) {
+        return appointmentRepository.findByIdAndPatientId(id, patientId)
+                .orElseThrow(() -> new AppointmentNotFoundException(
+                "Agendamento não encontrado para o ID informado"));
     }
 }

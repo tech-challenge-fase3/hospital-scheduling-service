@@ -77,6 +77,20 @@ public class AppointmentRepositoryAdapter implements AppointmentRepository {
     }
 
     @Override
+    public Optional<Appointment> findByIdAndPatientId(UUID id, String patientId) {
+        return appointmentJpaRepository.findByIdAndPatientId(id, patientId)
+                .map(appointmentPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public List<Appointment> findByPatientId(String patientId) {
+        return appointmentJpaRepository.findByPatientIdOrderByAppointmentDateAsc(patientId)
+                .stream()
+                .map(appointmentPersistenceMapper::toDomain)
+                .toList();
+    }
+
+    @Override
     public List<Appointment> findAll() {
         return appointmentJpaRepository.findAll().stream()
                 .map(appointmentPersistenceMapper::toDomain)

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import com.hospital.schedulingservice.infra.controller.dto.AppointmentRequestDTO;
 import com.hospital.schedulingservice.infra.controller.dto.AppointmentResponseDTO;
@@ -24,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 @Tag(name = "Appointments", description = "Endpoints para gerenciamento de agendamentos médicos")
 @RequestMapping("/api/v1/appointments")
@@ -142,7 +144,8 @@ public interface AppointmentControllerDocs {
         )
     })
     @GetMapping
-    ResponseEntity<List<AppointmentResponseDTO>> listAll();
+    ResponseEntity<List<AppointmentResponseDTO>> listAll(
+            @AuthenticationPrincipal Jwt jwt);
 
     @Operation(summary = "Buscar agendamento por ID", description = "Retorna os detalhes de um agendamento específico através do seu ID único.")
     @ApiResponses(value = {
@@ -185,5 +188,7 @@ public interface AppointmentControllerDocs {
         )
     })
     @GetMapping("/{id}")
-    ResponseEntity<AppointmentResponseDTO> findById(@PathVariable("id") UUID id);
+    ResponseEntity<AppointmentResponseDTO> findById(
+            @PathVariable("id") UUID id,
+            @AuthenticationPrincipal Jwt jwt);
 }

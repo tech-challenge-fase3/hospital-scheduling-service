@@ -14,6 +14,10 @@ public interface AppointmentRepository {
 
     Optional<Appointment> findById(UUID id);
 
+    Optional<Appointment> findByIdAndPatientId(UUID id, String patientId);
+
+    List<Appointment> findByPatientId(String patientId);
+
     List<Appointment> findAll();
 
 }

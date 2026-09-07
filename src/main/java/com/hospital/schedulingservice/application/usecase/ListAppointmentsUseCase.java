@@ -19,4 +19,8 @@ public class ListAppointmentsUseCase {
     public List<Appointment> execute() {
         return appointmentRepository.findAll();
     }
+
+    public List<Appointment> executeForPatient(String patientId) {
+        return appointmentRepository.findByPatientId(patientId);
+    }
 }

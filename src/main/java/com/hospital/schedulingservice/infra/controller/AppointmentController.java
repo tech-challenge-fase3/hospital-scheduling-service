@@ -1,10 +1,13 @@
 package com.hospital.schedulingservice.infra.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hospital.schedulingservice.application.usecase.CreateAppointmentUseCase;
@@ -59,9 +62,13 @@ public class AppointmentController implements AppointmentControllerDocs {
     }
 
     @Override
-    public ResponseEntity<List<AppointmentResponseDTO>> listAll() {
+    public ResponseEntity<List<AppointmentResponseDTO>> listAll(Jwt jwt) {
+        List<Appointment> domainAppointments = isPatient(jwt)
+                ? listAppointmentsUseCase.executeForPatient(requirePatientId(jwt))
+                : listAppointmentsUseCase.execute();
+
         List<AppointmentResponseDTO> appointments
-                = listAppointmentsUseCase.execute()
+                = domainAppointments
                         .stream()
                         .map(appointmentWebMapper::toResponse)
                         .toList();
@@ -70,11 +77,33 @@ public class AppointmentController implements AppointmentControllerDocs {
     }
 
     @Override
-    public ResponseEntity<AppointmentResponseDTO> findById(UUID id) {
-        Appointment appointment = findAppointmentByIdUseCase.execute(id);
+    public ResponseEntity<AppointmentResponseDTO> findById(UUID id, Jwt jwt) {
+        Appointment appointment = isPatient(jwt)
+                ? findAppointmentByIdUseCase.executeForPatient(id, requirePatientId(jwt))
+                : findAppointmentByIdUseCase.execute(id);
         AppointmentResponseDTO response
                 = appointmentWebMapper.toResponse(appointment);
         return ResponseEntity.ok(response);
+    }
+
+    private boolean isPatient(Jwt jwt) {
+        Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
+        if (realmAccess == null) {
+            return false;
+        }
+
+        Object roles = realmAccess.get("roles");
+        return roles instanceof List<?> roleList
+                && roleList.stream().map(Object::toString).anyMatch("PATIENT"::equals);
+    }
+
+    private String requirePatientId(Jwt jwt) {
+        String patientId = jwt.getClaimAsString("patientId");
+        if (patientId == null || patientId.isBlank()) {
+            throw new AccessDeniedException(
+                    "O usuário paciente não possui um patientId associado");
+        }
+        return patientId;
     }
 
     @Override
