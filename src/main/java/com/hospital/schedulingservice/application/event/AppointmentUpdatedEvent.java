@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record AppointmentUpdatedEvent(
+        UUID eventId,
+        String eventType,
+        UUID appointmentId,
         UUID id,
         String patientId,
         String doctorId,

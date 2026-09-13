@@ -1,5 +1,7 @@
 package com.hospital.schedulingservice.infra.messaging;
 
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -40,7 +42,10 @@ public class RabbitAppointmentEventPublisherAdapter
 
         try {
             AppointmentCreatedEvent event
-                    = appointmentEventMapper.toCreatedEvent(appointment);
+                    = appointmentEventMapper.toCreatedEvent(
+                            appointment,
+                            UUID.randomUUID()
+                    );
 
             rabbitTemplate.convertAndSend(
                     RabbitMQConfig.APPOINTMENT_EXCHANGE,
@@ -76,7 +81,10 @@ public class RabbitAppointmentEventPublisherAdapter
 
         try {
             AppointmentUpdatedEvent event
-                    = appointmentEventMapper.toUpdatedEvent(appointment);
+                    = appointmentEventMapper.toUpdatedEvent(
+                            appointment,
+                            UUID.randomUUID()
+                    );
 
             rabbitTemplate.convertAndSend(
                     RabbitMQConfig.APPOINTMENT_EXCHANGE,

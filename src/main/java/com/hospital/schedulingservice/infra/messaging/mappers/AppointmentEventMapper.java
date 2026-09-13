@@ -1,5 +1,7 @@
 package com.hospital.schedulingservice.infra.messaging.mappers;
 
+import java.util.UUID;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -10,23 +12,29 @@ import com.hospital.schedulingservice.domain.appointment.Appointment;
 @Mapper(componentModel = "spring")
 public interface AppointmentEventMapper {
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "patientId", target = "patientId")
-    @Mapping(source = "doctorId", target = "doctorId")
-    @Mapping(source = "appointmentDate", target = "appointmentDate")
-    @Mapping(source = "status", target = "status")
-    @Mapping(source = "notes", target = "notes")
-    @Mapping(source = "createdAt", target = "createdAt")
-    @Mapping(source = "updatedAt", target = "updatedAt")
-    AppointmentCreatedEvent toCreatedEvent(Appointment appointment);
+    @Mapping(source = "appointment.id", target = "id")
+    @Mapping(source = "appointment.patientId", target = "patientId")
+    @Mapping(source = "appointment.doctorId", target = "doctorId")
+    @Mapping(source = "appointment.appointmentDate", target = "appointmentDate")
+    @Mapping(source = "appointment.status", target = "status")
+    @Mapping(source = "appointment.notes", target = "notes")
+    @Mapping(source = "appointment.createdAt", target = "createdAt")
+    @Mapping(source = "appointment.updatedAt", target = "updatedAt")
+    @Mapping(source = "eventId", target = "eventId")
+    @Mapping(target = "eventType", constant = "APPOINTMENT_CREATED")
+    @Mapping(source = "appointment.id", target = "appointmentId")
+    AppointmentCreatedEvent toCreatedEvent(Appointment appointment, UUID eventId);
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "patientId", target = "patientId")
-    @Mapping(source = "doctorId", target = "doctorId")
-    @Mapping(source = "appointmentDate", target = "appointmentDate")
-    @Mapping(source = "status", target = "status")
-    @Mapping(source = "notes", target = "notes")
-    @Mapping(source = "createdAt", target = "createdAt")
-    @Mapping(source = "updatedAt", target = "updatedAt")
-    AppointmentUpdatedEvent toUpdatedEvent(Appointment appointment);
+    @Mapping(source = "appointment.id", target = "id")
+    @Mapping(source = "appointment.patientId", target = "patientId")
+    @Mapping(source = "appointment.doctorId", target = "doctorId")
+    @Mapping(source = "appointment.appointmentDate", target = "appointmentDate")
+    @Mapping(source = "appointment.status", target = "status")
+    @Mapping(source = "appointment.notes", target = "notes")
+    @Mapping(source = "appointment.createdAt", target = "createdAt")
+    @Mapping(source = "appointment.updatedAt", target = "updatedAt")
+    @Mapping(source = "eventId", target = "eventId")
+    @Mapping(target = "eventType", constant = "APPOINTMENT_UPDATED")
+    @Mapping(source = "appointment.id", target = "appointmentId")
+    AppointmentUpdatedEvent toUpdatedEvent(Appointment appointment, UUID eventId);
 }
