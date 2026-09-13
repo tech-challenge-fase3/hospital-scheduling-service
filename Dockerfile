@@ -6,11 +6,13 @@ COPY hospital-scheduling-service/.mvn hospital-scheduling-service/.mvn
 COPY hospital-scheduling-service/mvnw hospital-scheduling-service/mvnw
 COPY hospital-scheduling-service/src hospital-scheduling-service/src
 RUN chmod +x hospital-scheduling-service/mvnw \
-    && ./hospital-scheduling-service/mvnw -f hospital-scheduling-service/pom.xml clean package -DskipTests
+    && ./hospital-scheduling-service/mvnw -f hospital-scheduling-service/pom.xml clean package -DskipTests \
+    && cd hospital-scheduling-service/target \
+    && jar xf app.jar META-INF/MANIFEST.MF \
+    && grep -q 'Main-Class: org.springframework.boot.loader.launch.JarLauncher' META-INF/MANIFEST.MF
 
 FROM eclipse-temurin:25-jre
 WORKDIR /app
-# Alterado para ignorar arquivos que terminam em .original.jar
-COPY --from=build /workspace/hospital-scheduling-service/target/scheduling-service-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --from=build /workspace/hospital-scheduling-service/target/app.jar /app/app.jar
 EXPOSE 8081
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
